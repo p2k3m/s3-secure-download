@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>File Explorer</title>
+	<link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.blueopal.min.css">
+	<link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.blueopal.mobile.min.css">
+
+   <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.common.min.css">
+    <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.rtl.min.css">
+    <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.default.min.css">
+    <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.dataviz.min.css">
+    <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.dataviz.default.min.css">
+    <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.mobile.all.min.css">
+
+		 <link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.blueopal.min.css">
+	<link rel="stylesheet" href="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.blueopal.mobile.min.css">
+
+    <script src="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/jquery-1.9.1.min.js"></script>
+    <script src="https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/kendo.all.min.js"></script>
+
+</head>
+<body>
+
+        <div id="example">
+            <div id="grid"></div>
+            <script>
+
+			function abc(){
+
+			var res;
+
+
+  var abcd = document.location.href;
+	var n = abcd.length;
+	var number = abcd.indexOf("id_token=")+9;
+	var afteridtoken = abcd.substring(number);
+	
+var m = n-number;
+var pu = afteridtoken.split("&");
+res = afteridtoken.substring(0, pu[0].length);
+
+return res;
+		}
+
+		function def(title){
+
+			//alert("title is ==> "+title);
+			return title.replace(" ", "+");
+			 
+		}
+
+		function bytesToHumanReadable(sizeInBytes) {
+  var i = -1;
+  var units = [' kB', ' MB', ' GB'];
+  do {
+    sizeInBytes = sizeInBytes / 1024;
+    i++;
+  } while (sizeInBytes > 1024);
+  return Math.max(sizeInBytes, 0.1).toFixed(1) + units[i];
+}
+
+                $(document).ready(function() {
+
+					var res;
+
+
+  var abcd = document.location.href;
+	var n = abcd.length;
+		var number = abcd.indexOf("id_token=")+9;
+
+	var afteridtoken = abcd.substring(number);
+	
+var m = n-number;
+var pu = afteridtoken.split("&");
+res = afteridtoken.substring(0, pu[0].length);
+
+
+ kendo.ui.FilterCell.fn.options.template = function(e){
+            e.element.kendoAutoComplete({
+              serverFiltering: false,
+              valuePrimitive: true,
+              noDataTemplate: ''
+            });
+          }
+
+
+                    $("#grid").kendoGrid({
+                        dataSource: {
+                            //type: "json",
+                            transport: {
+                                //read: "https://demos.telerik.com/kendo-ui/service/Northwind.svc/Orders"
+								read: {
+            url: "https://52j9xl0hi0.execute-api.eu-west-1.amazonaws.com/lst-nonprod-ma/", // API Gateway for S3 Proxy 
+            type: 'GET',
+            beforeSend: function(req) {
+                req.setRequestHeader('Authorization', res);
+            }
+} ,
+parameterMap: function(options){
+	var test = kendo.stringify(options.filter);
+	var test1="";
+	var sillyString = "";
+	if (test!=undefined)
+	{
+var n = test.indexOf("value");
+	//alert("n is "+n);
+		var m = test.substring(n+5);
+
+		var k = m.split(",");
+
+
+//alert("k is "+k[0]);
+		test1= k[0].substring(3);
+		 sillyString = test1.slice(0, -1);
+
+	}
+	 
+//alert(sillyString);
+
+return ({
+                                prefix:sillyString,
+                                
+                            });
+							}
+                            },
+                            schema: {
+                        // specify the the schema is XML
+                        type: "xml",
+                        // the XML element which represents a single data record
+                        data: "/ListBucketResult/Contents",
+                        // define the model - the object which will represent a single data record
+                        model: {
+                            // configure the fields of the object
+                            fields: {
+                                // the "title" field is mapped to the text of the "title" XML element
+                                title: "Key/text()",
+                                // the "author" field is mapped to the text of the "author" XML element
+                                LastModified: "LastModified/text()",
+                                // the "url" field is mapped to the text of the "url" XML element
+                              //  url: "url/text()",
+
+								url: 'abcd',
+
+
+                                // the "cover" field is mapped to the "id" attribute of the "book" XML element
+                                Size: "Size/text()"
+                            }
+                        }
+                    },
+                            pageSize: 50,
+                           sortable: true,
+                          serverFiltering: true,
+                        },
+                        height: 550,
+                        filterable: {
+							extra: false,
+                            mode: "row"
+                        },
+                        pageable: true,
+                       columns: [{
+
+                        field: "title",
+                        width: 90,
+                        title: "File Name",
+					 filterable: {
+                    cell: {
+                        
+						showOperators: false
+                    }
+                }
+                    }, {
+                        field: "LastModified",
+                        width: 90,
+                        title: "LastModified Timestamp",
+						filterable: false
+                    }, 
+					
+					{
+                        field: "url",
+                        width: 90,
+                        title: "Download",
+						filterable: false,
+						//template: "<a href=https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/rcsi/nonprod/explorer/rcsi-explorer-download.html?a=#= title #><img src='xml-data/#= cover #' style='width: 50px'/></a>"
+
+						//template: "<a href=https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/rcsi/nonprod/explorer/rcsi-explorer-download.html?a=#= title #&b=#= abc()#><img src='xml-data/#= Size #' style='width: 50px'/></a>"
+
+						template: "<a target='_blank' href=https://s3.amazonaws.com/codes-elevate/lst-nonprod-ma/lst-nonprod-file-download.html?a=#= def(title) #&b=#= abc()#><img src='https://s3.amazonaws.com/ellucian-mc-prod-qe/quercus-file-ftp/download.gif' style='width: 50px'/></a>"
+
+
+
+                    },
+
+					{
+                        field: "Size",
+                        width: 90,
+                        title: "Size",
+						filterable: false,
+						template: " #= bytesToHumanReadable(Size)#"
+
+                    }]
+                    });
+                });
+            </script>
+        </div>
+
+
+</body>
+</html>
